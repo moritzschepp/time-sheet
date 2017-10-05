@@ -1,8 +1,33 @@
 require 'slop'
+require 'time'
 
 class Mps::Time::Cmd
   def run
     command = options.arguments.shift || 'default'
+
+    if d = options[:from]
+      if d.match(/^\d\d?-\d\d?$/)
+        d = "#{Mps::Time::Util.now.year}-#{d}"
+      end
+
+      if d.match(/^\d{4}$/)
+        d = "#{d}-01-01"
+      end
+
+      options[:from] = Date.parse(d)
+    end
+
+    if d = options[:to]
+      if d.match(/^\d\d?-\d\d?$/)
+        d = "#{Mps::Time::Util.now.year}-#{d}"
+      end
+
+      if d.match(/^\d{4}$/)
+        d = "#{d}-12-31"
+      end
+
+      options[:to] = Date.parse(d)
+    end
 
     if options[:help]
       puts options
@@ -15,27 +40,27 @@ class Mps::Time::Cmd
         when 'report', 'default'
           report
         when 'today', 't'
-          options[:from] = Utils.now.strftime('%Y-%m-%d')
+          options[:from] = Util.now.strftime('%Y-%m-%d')
           options[:summary] = true
           report
         when 'yesterday', 'y'
-          options[:from] = (Utils.now - 60 * 60 * 24).strftime('%Y-%m-%d')
-          options[:to] = Utils.now.strftime('%Y-%m-%d')
+          options[:from] = (Util.now - 60 * 60 * 24).strftime('%Y-%m-%d')
+          options[:to] = Util.now.strftime('%Y-%m-%d')
           options[:summary] = true
           report
         when 'week', 'w'
-          options[:from] = Utils.week_start.strftime('%Y-%m-%d')
-          options[:to] = Utils.week_end.strftime('%Y-%m-%d')
+          options[:from] = Util.week_start.strftime('%Y-%m-%d')
+          options[:to] = Util.week_end.strftime('%Y-%m-%d')
           options[:summary] = true
           report
         when 'last-week', 'lw'
-          options[:from] = (Utils.week_start - 60 * 60 * 24 * 6.5).strftime('%Y-%m-%d')
-          options[:to] = (Utils.week_end - 60 * 60 * 24 * 7.5).strftime('%Y-%m-%d')
+          options[:from] = (Util.week_start - 60 * 60 * 24 * 6.5).strftime('%Y-%m-%d')
+          options[:to] = (Util.week_end - 60 * 60 * 24 * 7.5).strftime('%Y-%m-%d')
           options[:summary] = true
           report
         when 'month', 'm'
-          options[:from] = Utils.month_start.strftime('%Y-%m-%d')
-          options[:to] = (Utils.month_end + 1).strftime('%Y-%m-%d')
+          options[:from] = Util.month_start.strftime('%Y-%m-%d')
+          options[:to] = (Util.month_end + 1).strftime('%Y-%m-%d')
           options[:summary] = true
           report
         else
@@ -56,7 +81,7 @@ class Mps::Time::Cmd
         'available commands:',
         '* overview (default): generate an html overview and open it with the browser',
         "* report: list entries conforming to given criteria",
-        "* invoice: compress similar entries and filter petty ones",
+        "* invoice: compress similar entries and filter petty ones. Optionally package the for e.g. monthly invoicing",
         "\noptions:"
       ].join("\n")
 
@@ -82,7 +107,7 @@ class Mps::Time::Cmd
     data.each do |package|
       tp = Mps::TablePrinter.new package
       puts tp.generate
-      puts '-'
+      puts "\n"
     end
   end
 

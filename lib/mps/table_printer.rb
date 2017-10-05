@@ -33,9 +33,10 @@ class Mps::TablePrinter
 
   def format(value, width)
     str = case value
-      when Numeric then value.to_s.rjust(width)
+      when Integer then value.to_s.rjust(width)
       when Date then value.strftime('%Y-%m-%d').rjust(width)
       when Time then value.strftime('%H:%M')
+      when Float then "%.2f" % value
       when nil then ' ' * width
       else
         value.ljust(width)
@@ -45,7 +46,8 @@ class Mps::TablePrinter
   def size(value)
     case value
       when nil then 0
-      when Numeric then value.to_s.size
+      when Integer then value.to_s.size
+      when Float then ("%.2f" % value).size
       when Date then 10
       when Time then 5
       else

@@ -40,11 +40,10 @@ module Mps::Time
     end
     rows = []
     grouped.each{|k, d| rows << [k.first, d, k.last]}
-
     packages = [[]]
     ptotal = 0
     rows.each do |row|
-      if options[:package]
+      if options[:package] > 0
         if ptotal + row[1] > options[:package] * 60
           filler = row.dup
           filler[1] = options[:package] * 60 - ptotal

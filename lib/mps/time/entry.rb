@@ -54,8 +54,8 @@ class Mps::Time::Entry
   end
 
   def matches?(filters)
-    from = (filters[:from] ? Date.parse(filters[:from]) : nil)
-    to = (filters[:to] ? Date.parse(filters[:to]) : nil)
+    from = (filters[:from] ? filters[:from] : nil)
+    to = (filters[:to] ? filters[:to] : nil)
 
     self.class.attrib_matches_any?(description, filters[:description]) &&
     self.class.attrib_matches_any?(project, filters[:project]) &&
