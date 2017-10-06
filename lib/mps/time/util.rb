@@ -29,6 +29,10 @@ module Mps::Time::Util
     @now ||= Time.now
   end
 
+  def self.today
+    now.to_date
+  end
+
   def self.human_duration(duration, rate)
     hours = duration.to_i / 60.0
     amount = (rate * hours)
