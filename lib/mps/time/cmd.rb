@@ -3,8 +3,6 @@ require 'time'
 
 class Mps::Time::Cmd
   def run
-    command = options.arguments.shift || 'default'
-
     if d = options[:from]
       if d.match(/^\d\d?-\d\d?$/)
         d = "#{Mps::Time::Util.now.year}-#{d}"
@@ -31,6 +29,8 @@ class Mps::Time::Cmd
 
     if options[:help]
       puts options
+    elsif options[:version]
+      puts Mps::VERSION
     else
       case command
         when 'invoice'
@@ -85,6 +85,8 @@ class Mps::Time::Cmd
         "\noptions:"
       ].join("\n")
 
+      o.boolean '-h', '--help', 'show help'
+      o.boolean '--version', 'show the version'
       o.array('-l', '--location', 'a location to gather data from (file or directory)',
         default: ["#{ENV['HOME']}/Desktop/cloud/time"]
       )
@@ -95,33 +97,39 @@ class Mps::Time::Cmd
       o.string '-d', '--description', 'consider only entries matching this description'
       o.float '-r', '--rate', 'use an alternative hourly rate (default: 86.70)', default: 86.70
       o.boolean '-s', '--summary', 'when reporting, add summary section'
-      o.boolean '-h', '--help', 'show help'
       o.boolean '-v', '--verbose', 'be more verbose'
       o.integer '--package', 'for invoice output: build packages of this duration in hours', default: 0
     end
   end
 
+  def command
+    options.arguments.shift || 'default'
+  end
+
   def invoice
-    data = Mps::Time.invoice(@options)
+    data = Mps::Time.invoice(options)
 
     data.each do |package|
       tp = Mps::TablePrinter.new package
       puts tp.generate
       puts "\n"
     end
+
+    print "last package duration: "
+    puts data.last.map{|entry| entry[1]}.sum
   end
 
   def report
-    data = Mps::Time.report(@options)
+    data = Mps::Time.report(options)
     tp = Mps::TablePrinter.new data['entries']
     puts tp.generate
 
-    if @options[:summary]
-      puts "\nsums: #{Mps::Time::Util.human_duration data['total'], @options[:rate]}"
+    if options[:summary]
+      puts "\nsums: #{Mps::Time::Util.human_duration data['total'], options[:rate]}"
       data['projects'].each do |pname, pdata|
-        puts "#{pname}: #{Mps::Time::Util.human_duration pdata['total'], @options[:rate]} "
+        puts "#{pname}: #{Mps::Time::Util.human_duration pdata['total'], options[:rate]} "
         pdata['activities'].each do |aname, atotal|
-          puts "  #{aname}: #{Mps::Time::Util.human_duration atotal, @options[:rate]}"
+          puts "  #{aname}: #{Mps::Time::Util.human_duration atotal, options[:rate]}"
         end
       end
     end
