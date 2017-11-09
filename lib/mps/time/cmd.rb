@@ -81,7 +81,7 @@ class Mps::Time::Cmd
         'available commands:',
         '* overview (default): generate an html overview and open it with the browser',
         "* report: list entries conforming to given criteria",
-        "* invoice: compress similar entries and filter petty ones. Optionally package the for e.g. monthly invoicing",
+        "* invoice: compress similar entries and filter petty ones. Optionally package for e.g. monthly invoicing",
         "\noptions:"
       ].join("\n")
 
@@ -99,6 +99,7 @@ class Mps::Time::Cmd
       o.boolean '-s', '--summary', 'when reporting, add summary section'
       o.boolean '-v', '--verbose', 'be more verbose'
       o.integer '--package', 'for invoice output: build packages of this duration in hours', default: 0
+      o.integer '--petty', 'fold records of a certain threshold into a "misc" activity', default: 0
     end
   end
 

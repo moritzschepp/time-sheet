@@ -11,8 +11,7 @@ module Mps::Time
     results = {
       'entries' => [],
       'total' => 0.0,
-      'projects' => {},
-      'petty' => 0
+      'projects' => {}
     }
 
     Parser.new(options[:location]).entries.each do |e|
@@ -63,19 +62,21 @@ module Mps::Time
       ptotal += row[1]
     end
 
-    packages.map do |package|
-      petty = 0
-      package.select! do |row|
-        if row[1] < 20
-          petty += row[1]
-          next false
+    if options[:petty]
+      packages.map do |package|
+        petty = 0
+        package.select! do |row|
+          if row[1] < options[:petty]
+            petty += row[1]
+            next false
+          end
+          true
         end
-        true
+        if petty > 0
+          package << [nil, petty, 'misc']
+        end
+        package
       end
-      if petty > 0
-        package << [nil, petty, 'misc']
-      end
-      package
     end
   end
 
