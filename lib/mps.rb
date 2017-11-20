@@ -1,3 +1,5 @@
+Bundler.setup
+
 require 'mps/version'
 
 begin
