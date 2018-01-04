@@ -41,26 +41,32 @@ class Mps::Time::Cmd
           report
         when 'today', 't'
           options[:from] = Mps::Time::Util.today
-          options[:summary] = true
-          report
-        when 'yesterday', 'y'
-          options[:from] = (Mps::Time::Util.now - 60 * 60 * 24).to_date
           options[:to] = Mps::Time::Util.today
           options[:summary] = true
           report
+        when 'yesterday', 'y'
+          options[:from] = Mps::Time::Util.yesterday
+          options[:to] = Mps::Time::Util.yesterday
+          options[:summary] = true
+          report
         when 'week', 'w'
-          options[:from] = Mps::Time::Util.week_start.to_date
-          options[:to] = Mps::Time::Util.week_end.to_date
+          options[:from] = Mps::Time::Util.week_start
+          options[:to] = Mps::Time::Util.week_end
           options[:summary] = true
           report
         when 'last-week', 'lw'
-          options[:from] = (Mps::Time::Util.week_start - 60 * 60 * 24 * 6.5).to_date
-          options[:to] = (Mps::Time::Util.week_end - 60 * 60 * 24 * 7.5).to_date
+          options[:from] = Mps::Time::Util.week_start(-1)
+          options[:to] = Mps::Time::Util.week_end(-1)
           options[:summary] = true
           report
         when 'month', 'm'
-          options[:from] = Mps::Time::Util.month_start.to_date
-          options[:to] = (Mps::Time::Util.month_end + 1).to_date
+          options[:from] = Mps::Time::Util.month_start
+          options[:to] = Mps::Time::Util.month_end
+          options[:summary] = true
+          report
+        when 'last-month', 'lm'
+          options[:from] = Mps::Time::Util.month_start(-1)
+          options[:to] = Mps::Time::Util.month_end(-1)
           options[:summary] = true
           report
         else

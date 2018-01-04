@@ -1,11 +1,7 @@
-Bundler.setup
-
 require 'mps/version'
 
-begin
+if defined?(Bundler)
   require 'pry'
-rescue LoadError => e
-  # do nothing, probably we are in production
 end
 
 module Mps
