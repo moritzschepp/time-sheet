@@ -1,3 +1,5 @@
+require 'colorize'
+
 class Mps::TablePrinter
 
   def initialize(data = [])
@@ -17,8 +19,12 @@ class Mps::TablePrinter
 
     result = []
     @data.each do |row|
-      output = row.each_with_index.map do |c, i|
-        format(c, widths[i])
+      output = if row == '-'
+        widths.map{|w| '-' * w}
+      else
+        row.each_with_index.map do |r, i|
+          format(r, widths[i])
+        end
       end
       result << output.join(' | ')
     end
@@ -27,7 +33,7 @@ class Mps::TablePrinter
 
   def widths
     @widths ||= @data.first.each_with_index.map do |c, i|
-      @data.map{|row| size(row[i])}.max
+      @data.map{|row| row == '-' ? 0 : size(row[i])}.max
     end
   end
 
@@ -35,8 +41,8 @@ class Mps::TablePrinter
     str = case value
       when Integer then value.to_s.rjust(width)
       when Date then value.strftime('%Y-%m-%d').rjust(width)
-      when Time then value.strftime('%H:%M')
-      when Float then "%.2f" % value
+      when Time then value.strftime('%H:%M').rjust(width)
+      when Float then ("%.2f" % value).rjust(width)
       when nil then ' ' * width
       else
         value.ljust(width)

@@ -131,14 +131,44 @@ class Mps::Time::Cmd
     tp = Mps::TablePrinter.new data['entries']
     puts tp.generate
 
+    puts "\nSummary:"
+
     if options[:summary]
-      puts "\nsums: #{Mps::Time::Util.human_duration data['total'], options[:rate]}"
-      data['projects'].each do |pname, pdata|
-        puts "#{pname}: #{Mps::Time::Util.human_duration pdata['total'], options[:rate]} "
-        pdata['activities'].each do |aname, atotal|
-          puts "  #{aname}: #{Mps::Time::Util.human_duration atotal, options[:rate]}"
+      tdata = [['project', 'activity', 'time [m]', 'time [h]', 'price [€]']]
+      tdata << [
+        'all',
+        '',
+        Mps::Time::Util.minutes(data['total']),
+        Mps::Time::Util.hours(data['total']),
+        Mps::Time::Util.price(data['total'], options[:rate])
+      ]
+
+      data['projects'].sort_by{|k, v| v['total']}.reverse.to_h.each do |pname, pdata|
+        previous = nil
+
+        tdata << '-'
+        tdata << [
+          pname,
+          'all',
+          Mps::Time::Util.minutes(pdata['total']),
+          Mps::Time::Util.hours(pdata['total']),
+          Mps::Time::Util.price(pdata['total'], options[:rate])
+        ]
+        
+        pdata['activities'].sort_by{|k, v| v}.reverse.to_h.each do |aname, atotal|
+          tdata << [
+            '',
+            aname,
+            Mps::Time::Util.minutes(atotal),
+            Mps::Time::Util.hours(atotal),
+            Mps::Time::Util.price(atotal, options[:rate])
+          ]
+          previous = pname
         end
       end
+
+      tp = Mps::TablePrinter.new tdata
+      puts tp.generate
     end
   end
 end

@@ -46,10 +46,16 @@ module Mps::Time::Util
     now.to_date - 1
   end
 
-  def self.human_duration(duration, rate)
-    hours = duration.to_i / 60.0
-    amount = (rate * hours)
-    "#{duration.to_i}m (#{hours.round(2)}h, € #{amount.round(2)})"
+  def self.minutes(duration)
+    duration.to_i
+  end
+
+  def self.hours(duration)
+    (duration / 60.0).round(2)
+  end
+
+  def self.price(duration, rate)
+    (self.hours(duration) * rate).round(2)
   end
 
 end
