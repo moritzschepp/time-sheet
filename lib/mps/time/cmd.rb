@@ -131,9 +131,9 @@ class Mps::Time::Cmd
     tp = Mps::TablePrinter.new data['entries']
     puts tp.generate
 
-    puts "\nSummary:"
-
     if options[:summary]
+      puts "\nSummary:"
+
       tdata = [['project', 'activity', 'time [m]', 'time [h]', 'price [€]']]
       tdata << [
         'all',
@@ -167,8 +167,26 @@ class Mps::Time::Cmd
         end
       end
 
+      tdata << '-'
+
       tp = Mps::TablePrinter.new tdata
       puts tp.generate
+
+      # averages
+      days = (
+        (options[:to] || data['entries'].last[1]).to_date -
+        (options[:from] || data['entries'].first[0]).to_date
+      )
+      weeks = days / 7.0
+      months = days / 30.0
+      workdays = weeks * 5.0
+      hours_worked = Mps::Time::Util.hours(data['total'])
+      puts [
+        "worked: h/day: #{(hours_worked / days).round(2)}",
+        "h/workday: #{(hours_worked / workdays).round(2)}",
+        "h/week: #{(hours_worked / weeks).round(2)}",
+        "h/month: #{(hours_worked / months).round(2)}"
+      ].join(', ')
     end
   end
 end
