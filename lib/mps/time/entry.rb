@@ -41,6 +41,34 @@ class Mps::Time::Entry
     )
   end
 
+  # Experiment to add timezone support. However, this would complicate every day
+  # handing because of daylight saving time changes.
+  # def start_zone
+  #   @start_zone ||= if v = @data['start_zone']
+  #     # allow a name prefixing the value
+  #     v.split(/\s/).last
+  #   elsif v = self.prev.start_zone
+  #     v
+  #   else
+  #     self.class.now.getlocal.utc_offset
+  #     # use this process' timezone
+  #     nil
+  #   end
+  # end
+
+  # def end_zone
+  #   @end_zone ||= if v = @data['end_zone']
+  #     # allow a name prefixing the value
+  #     v.split(/\s/).last
+  #   elsif self.prev && v = self.prev.end_zone
+  #     v
+  #   else
+  #     # self.class.now.getlocal.utc_offset
+  #     # use this process' timezone
+  #     nil
+  #   end
+  # end
+
   def duration
     (self.end - self.start) / 60
   end
