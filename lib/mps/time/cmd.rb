@@ -177,6 +177,7 @@ class Mps::Time::Cmd
         (options[:to] || data['entries'].last[1]).to_date -
         (options[:from] || data['entries'].first[0]).to_date
       )
+      days = 1 if days.to_i == 0
       weeks = days / 7.0
       months = days / 30.0
       workdays = weeks * 5.0
