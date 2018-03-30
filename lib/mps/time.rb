@@ -80,9 +80,4 @@ module Mps::Time
     end
   end
 
-  def self.show_html(options)
-    render(options)
-    system 'chromium /tmp/time.html'
-  end
-
 end

@@ -35,8 +35,6 @@ class Mps::Time::Cmd
       case command
         when 'invoice'
           invoice
-        when 'overview'
-          show_html
         when 'report', 'default'
           report
         when 'today', 't'
@@ -69,6 +67,8 @@ class Mps::Time::Cmd
           options[:to] = Mps::Time::Util.month_end(-1)
           options[:summary] = true
           report
+        when 'overview'
+          overview
         else
           raise "unknown command: #{command}"
       end
@@ -85,10 +85,9 @@ class Mps::Time::Cmd
       o.banner = [
         "usage: time.rb [command] [options]\n",
         'available commands:',
-        '* overview (default): generate an html overview and open it with the browser',
-        "* report: list entries conforming to given criteria",
-        "* invoice: compress similar entries and filter petty ones. Optionally package for e.g. monthly invoicing",
-        "\noptions:"
+        "  report (default): list entries conforming to given criteria",
+        "  invoice: compress similar entries and filter petty ones. Optionally package for e.g. monthly invoicing",
+        "\n  general options:"
       ].join("\n")
 
       o.boolean '-h', '--help', 'show help'
@@ -104,6 +103,7 @@ class Mps::Time::Cmd
       o.float '-r', '--rate', 'use an alternative hourly rate (default: 86.70)', default: 86.70
       o.boolean '-s', '--summary', 'when reporting, add summary section'
       o.boolean '-v', '--verbose', 'be more verbose'
+      o.separator "\n  invoice options:"
       o.integer '--package', 'for invoice output: build packages of this duration in hours', default: 0
       o.integer '--petty', 'fold records of a certain threshold into a "misc" activity', default: 0
     end
@@ -190,4 +190,5 @@ class Mps::Time::Cmd
       ].join(', ')
     end
   end
+
 end
