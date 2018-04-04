@@ -83,13 +83,15 @@ class Mps::Time::Entry
 
   def matches?(filters)
     from = (filters[:from] ? filters[:from] : nil)
+    from = from.to_time if from.is_a?(Date)
     to = (filters[:to] ? filters[:to] : nil)
+    to = (to + 1).to_time if to.is_a?(Date)
 
     self.class.attrib_matches_any?(description, filters[:description]) &&
     self.class.attrib_matches_any?(project, filters[:project]) &&
     self.class.attrib_matches_any?(activity, filters[:activity]) &&
-    (!from || from <= date) &&
-    (!to || to >= date)
+    (!from || from <= self.start) &&
+    (!to || to >= self.end)
   end
 
   def valid?

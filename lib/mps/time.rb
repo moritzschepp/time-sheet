@@ -14,7 +14,11 @@ module Mps::Time
       'projects' => {}
     }
 
+    x = nil
     Parser.new(options[:location]).entries.each do |e|
+      unless x
+        x = true
+      end
       if e.matches?(options)
         results['total'] += e.duration
         results['projects'][e.project] ||= {'total' => 0.0, 'activities' => {}}

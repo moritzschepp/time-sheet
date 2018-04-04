@@ -12,7 +12,7 @@ class Mps::Time::Cmd
         d = "#{d}-01-01"
       end
 
-      options[:from] = Date.parse(d)
+      options[:from] = Time.parse(d)
     end
 
     if d = options[:to]
@@ -24,7 +24,7 @@ class Mps::Time::Cmd
         d = "#{d}-12-31"
       end
 
-      options[:to] = Date.parse(d)
+      options[:to] = Time.parse(d)
     end
 
     if options[:help]
@@ -130,6 +130,7 @@ class Mps::Time::Cmd
     data = Mps::Time.report(options)
     tp = Mps::TablePrinter.new data['entries']
     puts tp.generate
+
 
     if options[:summary]
       puts "\nSummary:"
