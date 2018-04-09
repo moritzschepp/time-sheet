@@ -39,7 +39,6 @@ class Mps::Time::Cmd
           report
         when 'today', 't'
           options[:from] = Mps::Time::Util.today
-          options[:to] = Mps::Time::Util.today
           options[:summary] = true
           report
         when 'yesterday', 'y'
@@ -49,7 +48,6 @@ class Mps::Time::Cmd
           report
         when 'week', 'w'
           options[:from] = Mps::Time::Util.week_start
-          options[:to] = Mps::Time::Util.week_end
           options[:summary] = true
           report
         when 'last-week', 'lw'
@@ -59,7 +57,6 @@ class Mps::Time::Cmd
           report
         when 'month', 'm'
           options[:from] = Mps::Time::Util.month_start
-          options[:to] = Mps::Time::Util.month_end
           options[:summary] = true
           report
         when 'last-month', 'lm'
