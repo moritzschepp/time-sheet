@@ -110,7 +110,16 @@ class Mps::Time::Cmd
     options.arguments.shift || 'default'
   end
 
+  def convert_to_time
+    options[:from] = options[:from].to_time
+    if options[:to].is_a?(Date)
+      options[:to] = options[:to].to_time + 24 * 60 * 60
+    end
+  end
+
   def invoice
+    convert_to_time
+
     data = Mps::Time.invoice(options)
 
     data.each do |package|
@@ -124,6 +133,8 @@ class Mps::Time::Cmd
   end
 
   def report
+    convert_to_time
+    
     data = Mps::Time.report(options)
     tp = Mps::TablePrinter.new data['entries']
     puts tp.generate
@@ -175,12 +186,12 @@ class Mps::Time::Cmd
         (options[:to] || data['entries'].last[1]).to_date -
         (options[:from] || data['entries'].first[0]).to_date
       )
-      days = 1 if days.to_i == 0
       weeks = days / 7.0
       months = days / 30.0
       workdays = weeks * 5.0
       hours_worked = Mps::Time::Util.hours(data['total'])
       puts [
+        "days: #{days.to_i}",
         "worked: h/day: #{(hours_worked / days).round(2)}",
         "h/workday: #{(hours_worked / workdays).round(2)}",
         "h/week: #{(hours_worked / weeks).round(2)}",
