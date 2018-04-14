@@ -111,7 +111,9 @@ class Mps::Time::Cmd
   end
 
   def convert_to_time
-    options[:from] = options[:from].to_time
+    if options[:from]
+      options[:from] = options[:from].to_time
+    end
     if options[:to].is_a?(Date)
       options[:to] = options[:to].to_time + 24 * 60 * 60
     end
@@ -134,7 +136,7 @@ class Mps::Time::Cmd
 
   def report
     convert_to_time
-    
+
     data = Mps::Time.report(options)
     tp = Mps::TablePrinter.new data['entries']
     puts tp.generate
@@ -181,21 +183,12 @@ class Mps::Time::Cmd
       tp = Mps::TablePrinter.new tdata
       puts tp.generate
 
-      # averages
-      days = (
-        (options[:to] || data['entries'].last[1]).to_date -
-        (options[:from] || data['entries'].first[0]).to_date
-      )
-      weeks = days / 7.0
-      months = days / 30.0
-      workdays = weeks * 5.0
-      hours_worked = Mps::Time::Util.hours(data['total'])
       puts [
-        "days: #{days.to_i}",
-        "worked: h/day: #{(hours_worked / days).round(2)}",
-        "h/workday: #{(hours_worked / workdays).round(2)}",
-        "h/week: #{(hours_worked / weeks).round(2)}",
-        "h/month: #{(hours_worked / months).round(2)}"
+        "days: #{data['averages']['days']}",
+        "worked: h/day: #{data['averages']['hours_per_day'].round(2)}",
+        "h/workday: #{data['averages']['hours_per_workday'].round(2)}",
+        "h/week: #{data['averages']['hours_per_week'].round(2)}",
+        "h/month(30 days): #{data['averages']['hours_per_month'].round(2)}"
       ].join(', ')
     end
   end

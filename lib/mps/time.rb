@@ -30,7 +30,37 @@ module Mps::Time
       end
     end
 
+    averages(results, options)
+
     results
+  end
+
+  def self.averages(results, options)
+    days = 0
+
+    unless results['entries'].empty?
+      days = (
+        (options[:to] || results['entries'].last[1]).to_date -
+        (options[:from] || results['entries'].first[0]).to_date
+      ).to_i
+    end
+
+    weeks = days / 7.0
+    months = days / 30.0
+    workdays = weeks * 5.0
+    worked = Mps::Time::Util.hours(results['total'])
+
+    results['averages'] = {
+      'days' => days,
+      'weeks' => weeks,
+      'months' => months,
+      'workdays' => workdays,
+      'worked' => worked,
+      'hours_per_day' => worked / days,
+      'hours_per_workday' => worked / workdays,
+      'hours_per_week' => worked / weeks,
+      'hours_per_month' => worked / months,
+    }
   end
 
   def self.invoice(options)
