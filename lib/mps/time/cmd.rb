@@ -130,8 +130,10 @@ class Mps::Time::Cmd
       puts "\n"
     end
 
-    print "last package duration: "
-    puts data.last.map{|entry| entry[1]}.sum
+    if options[:package]
+      package_total = data.last.map{|entry| entry[1]}.sum
+      puts "last package duration: #{package_total}/#{options[:package] * 60}"
+    end
   end
 
   def report
