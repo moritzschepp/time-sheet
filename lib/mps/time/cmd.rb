@@ -99,6 +99,7 @@ class Mps::Time::Cmd
       o.string '-d', '--description', 'consider only entries matching this description'
       o.float '-r', '--rate', 'use an alternative hourly rate (default: 86.70)', default: 86.70
       o.boolean '-s', '--summary', 'when reporting, add summary section'
+      o.boolean '--trim', 'compact the output for processing as CSV', default: false
       o.boolean '-v', '--verbose', 'be more verbose'
       o.separator "\n  invoice options:"
       o.integer '--package', 'for invoice output: build packages of this duration in hours', default: 0
@@ -125,7 +126,7 @@ class Mps::Time::Cmd
     data = Mps::Time.invoice(options)
 
     data.each do |package|
-      tp = Mps::TablePrinter.new package
+      tp = Mps::TablePrinter.new package, options
       puts tp.generate
       puts "\n"
     end
@@ -143,7 +144,7 @@ class Mps::Time::Cmd
     convert_to_time
 
     data = Mps::Time.report(options)
-    tp = Mps::TablePrinter.new data['entries']
+    tp = Mps::TablePrinter.new data['entries'], options
     puts tp.generate
 
 
@@ -185,7 +186,7 @@ class Mps::Time::Cmd
 
       tdata << '-'
 
-      tp = Mps::TablePrinter.new tdata
+      tp = Mps::TablePrinter.new tdata, options
       puts tp.generate
 
       puts [

@@ -1,8 +1,11 @@
 class Mps::TablePrinter
 
-  def initialize(data = [])
+  def initialize(data = [], options = {})
+    @options = options
     @data = data
   end
+
+  attr_reader :options
 
   def <<(row)
     @data << row
@@ -21,10 +24,10 @@ class Mps::TablePrinter
         widths.map{|w| '-' * w}
       else
         row.each_with_index.map do |r, i|
-          format(r, widths[i])
+          format(r, widths[i], i == row.size - 1)
         end
       end
-      result << output.join(' | ')
+      result << output.join(options[:trim] ? '|' : ' | ')
     end
     result.join("\n")
   end
@@ -35,7 +38,7 @@ class Mps::TablePrinter
     end
   end
 
-  def format(value, width)
+  def format(value, width, last_column = false)
     str = case value
       when Integer then value.to_s.rjust(width)
       when Date then value.strftime('%Y-%m-%d').rjust(width)
@@ -43,7 +46,7 @@ class Mps::TablePrinter
       when Float then ("%.2f" % value).rjust(width)
       when nil then ' ' * width
       else
-        value.ljust(width)
+        last_column ? value : value.ljust(width)
     end
   end
 
