@@ -131,8 +131,11 @@ class Mps::Time::Cmd
     end
 
     if options[:package]
-      package_total = data.last.map{|entry| entry[1]}.sum
-      puts "last package duration: #{package_total}/#{options[:package] * 60}"
+      package = data.last.map{|entry| entry[1]}.sum
+      total = options[:package] * 60
+      percent = (package / total.to_f * 100)
+
+      puts "last package duration: #{package}/#{total} (#{percent.round 2}%)"
     end
   end
 
