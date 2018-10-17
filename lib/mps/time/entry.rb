@@ -32,6 +32,7 @@ class Mps::Time::Entry
     )
   end
 
+
   def end
     ends_at = @data['end'] || (self.next ? self.next.start : self.class.now)
 

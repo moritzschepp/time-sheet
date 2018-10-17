@@ -36,13 +36,14 @@ module Mps::Time
   end
 
   def self.averages(results, options)
-    days = 0
+    days = 1
 
     unless results['entries'].empty?
-      days = (
-        (options[:to] || results['entries'].last[1]).to_date -
-        (options[:from] || results['entries'].first[0]).to_date
+      time = (
+        (options[:to] || Util.day_end) - 
+        (options[:from] || results['entries'].first[0].to_time)
       ).to_i
+      days = (time.to_f / 60 / 60 / 24).round
     end
 
     weeks = days / 7.0
