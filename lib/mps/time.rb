@@ -76,29 +76,43 @@ module Mps::Time
     grouped.each{|k, d| rows << [k.first, d, k.last]}
     packages = [[]]
     ptotal = 0
-    rows.each do |row|
+
+    while row = rows.shift
       if options[:package] > 0
-        if ptotal + row[1] > options[:package] * 60
+        new_package_size = ptotal + row[1]
+
+        if new_package_size > options[:package] * 60
           filler = row.dup
           filler[1] = options[:package] * 60 - ptotal
-          row[1] -= filler[1]
           packages.last << filler
           packages << []
           ptotal = 0
+
+          # we re-queue the remainder of the current row so that it is picked
+          # up by the next iteration
+          row[1] -= filler[1]
+          rows.unshift row
+          next
         end
 
-        if ptotal + row[1] == options[:package] * 60
+        if new_package_size == options[:package] * 60
+          packages.last << row
           packages << []
           ptotal = 0
+          next
         end
       end
-
+      
       packages.last << row
       ptotal += row[1]
     end
 
+    if packages.last.empty?
+      packages.pop
+    end
+
     if options[:petty]
-      packages.map do |package|
+      packages.map! do |package|
         petty = 0
         package.select! do |row|
           if row[1] < options[:petty]
@@ -113,6 +127,8 @@ module Mps::Time
         package
       end
     end
+
+    packages
   end
 
 end
