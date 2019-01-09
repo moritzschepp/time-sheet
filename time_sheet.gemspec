@@ -12,7 +12,7 @@ Gem::Specification.new do |spec|
 
   spec.summary       = "a time tracking solution based on spreadsheets"
 
-  s.metadata = {
+  spec.metadata = {
     "bug_tracker_uri"   => "https://github.com/moritzschepp/time-sheet/issues",
     "documentation_uri" => "https://github.com/moritzschepp/time-sheet",
     "homepage_uri"      => "https://github.com/moritzschepp/time-sheet",
