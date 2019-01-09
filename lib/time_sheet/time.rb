@@ -1,11 +1,11 @@
 require 'erb'
 
-module Mps::Time
-  autoload :Cmd, 'mps/time/cmd'
-  autoload :Entry, 'mps/time/entry'
-  autoload :Exception, 'mps/time/exception'
-  autoload :Parser, 'mps/time/parser'
-  autoload :Util, 'mps/time/util'
+module TimeSheet::Time
+  autoload :Cmd, 'time_sheet/time/cmd'
+  autoload :Entry, 'time_sheet/time/entry'
+  autoload :Exception, 'time_sheet/time/exception'
+  autoload :Parser, 'time_sheet/time/parser'
+  autoload :Util, 'time_sheet/time/util'
 
   def self.report(options)
     results = {
@@ -49,7 +49,7 @@ module Mps::Time
     weeks = days / 7.0
     months = days / 30.0
     workdays = weeks * 5.0
-    worked = Mps::Time::Util.hours(results['total'])
+    worked = TimeSheet::Time::Util.hours(results['total'])
 
     results['averages'] = {
       'days' => days,

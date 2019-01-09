@@ -1,4 +1,4 @@
-module Mps::Time::Util
+module TimeSheet::Time::Util
 
   def self.year_start(factor = 0)
     Date.new(Date.today.year + factor, 1, 1)

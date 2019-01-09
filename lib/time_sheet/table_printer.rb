@@ -1,4 +1,4 @@
-class Mps::TablePrinter
+class TimeSheet::TablePrinter
 
   def initialize(data = [], options = {})
     @options = options

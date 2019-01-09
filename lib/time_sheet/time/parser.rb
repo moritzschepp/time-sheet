@@ -1,6 +1,6 @@
 require 'spreadsheet'
 
-class Mps::Time::Parser
+class TimeSheet::Time::Parser
 
   def initialize(dirs)
     @dirs = dirs
@@ -24,7 +24,7 @@ class Mps::Time::Parser
       hashes_per_file.each do |hashes|
         file_results = []
         hashes.each do |e|
-          te = Mps::Time::Entry.new(e)
+          te = TimeSheet::Time::Entry.new(e)
           if file_results.last 
             file_results.last.next = te
             te.prev = file_results.last
@@ -37,7 +37,7 @@ class Mps::Time::Parser
       results.each do |r|
         unless r.valid?
           # byebug
-          raise Mps::Time::Exception.new("invalid time entry: #{r.to_row.inspect}")
+          raise TimeSheet::Time::Exception.new("invalid time entry: #{r.to_row.inspect}")
         end
       end
       results

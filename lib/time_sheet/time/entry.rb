@@ -1,4 +1,4 @@
-class Mps::Time::Entry
+class TimeSheet::Time::Entry
   def self.now
     @now ||= Time.now
   end

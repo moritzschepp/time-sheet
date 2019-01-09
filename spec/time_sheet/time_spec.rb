@@ -1,6 +1,6 @@
 require "spec_helper"
 
-RSpec.describe Mps::Time do
+RSpec.describe TimeSheet::Time do
   it 'should deal well with time entries overflowing a package' do
     opts = {
       location: ["spec/data/time_log.xls"],

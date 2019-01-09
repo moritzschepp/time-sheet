@@ -1,11 +1,11 @@
 require 'slop'
 require 'time'
 
-class Mps::Time::Cmd
+class TimeSheet::Time::Cmd
   def run
     if d = options[:from]
       if d.match(/^\d\d?-\d\d?$/)
-        d = "#{Mps::Time::Util.now.year}-#{d}"
+        d = "#{TimeSheet::Time::Util.now.year}-#{d}"
       end
 
       if d.match(/^\d{4}$/)
@@ -17,7 +17,7 @@ class Mps::Time::Cmd
 
     if d = options[:to]
       if d.match(/^\d\d?-\d\d?$/)
-        d = "#{Mps::Time::Util.now.year}-#{d}"
+        d = "#{TimeSheet::Time::Util.now.year}-#{d}"
       end
 
       if d.match(/^\d{4}$/)
@@ -30,7 +30,7 @@ class Mps::Time::Cmd
     if options[:help]
       puts options
     elsif options[:version]
-      puts Mps::VERSION
+      puts TimeSheet::VERSION
     else
       case command
         when 'invoice'
@@ -38,30 +38,30 @@ class Mps::Time::Cmd
         when 'report', 'default'
           report
         when 'today', 't'
-          options[:from] = Mps::Time::Util.today
+          options[:from] = TimeSheet::Time::Util.today
           options[:summary] = true
           report
         when 'yesterday', 'y'
-          options[:from] = Mps::Time::Util.yesterday
-          options[:to] = Mps::Time::Util.yesterday
+          options[:from] = TimeSheet::Time::Util.yesterday
+          options[:to] = TimeSheet::Time::Util.yesterday
           options[:summary] = true
           report
         when 'week', 'w'
-          options[:from] = Mps::Time::Util.week_start
+          options[:from] = TimeSheet::Time::Util.week_start
           options[:summary] = true
           report
         when 'last-week', 'lw'
-          options[:from] = Mps::Time::Util.week_start(-1)
-          options[:to] = Mps::Time::Util.week_end(-1)
+          options[:from] = TimeSheet::Time::Util.week_start(-1)
+          options[:to] = TimeSheet::Time::Util.week_end(-1)
           options[:summary] = true
           report
         when 'month', 'm'
-          options[:from] = Mps::Time::Util.month_start
+          options[:from] = TimeSheet::Time::Util.month_start
           options[:summary] = true
           report
         when 'last-month', 'lm'
-          options[:from] = Mps::Time::Util.month_start(-1)
-          options[:to] = Mps::Time::Util.month_end(-1)
+          options[:from] = TimeSheet::Time::Util.month_start(-1)
+          options[:to] = TimeSheet::Time::Util.month_end(-1)
           options[:summary] = true
           report
         when 'overview'
@@ -97,7 +97,7 @@ class Mps::Time::Cmd
       o.string '-p', '--project', 'take only entries of this project into account'
       o.string '-a', '--activity', 'take only entries of this activity into account'
       o.string '-d', '--description', 'consider only entries matching this description'
-      o.float '-r', '--rate', 'use an alternative hourly rate (default: 86.70)', default: 86.70
+      o.float '-r', '--rate', 'use an alternative hourly rate (default: 80.0)', default: 80.00
       o.boolean '-s', '--summary', 'when reporting, add summary section'
       o.boolean '--trim', 'compact the output for processing as CSV', default: false
       o.boolean '-v', '--verbose', 'be more verbose'
@@ -123,10 +123,10 @@ class Mps::Time::Cmd
   def invoice
     convert_to_time
 
-    data = Mps::Time.invoice(options)
+    data = TimeSheet::Time.invoice(options)
 
     data.each do |package|
-      tp = Mps::TablePrinter.new package, options
+      tp = TimeSheet::TablePrinter.new package, options
       puts tp.generate
       puts "\n"
     end
@@ -143,8 +143,8 @@ class Mps::Time::Cmd
   def report
     convert_to_time
 
-    data = Mps::Time.report(options)
-    tp = Mps::TablePrinter.new data['entries'], options
+    data = TimeSheet::Time.report(options)
+    tp = TimeSheet::TablePrinter.new data['entries'], options
     puts tp.generate
 
 
@@ -155,9 +155,9 @@ class Mps::Time::Cmd
       tdata << [
         'all',
         '',
-        Mps::Time::Util.minutes(data['total']),
-        Mps::Time::Util.hours(data['total']),
-        Mps::Time::Util.price(data['total'], options[:rate])
+        TimeSheet::Time::Util.minutes(data['total']),
+        TimeSheet::Time::Util.hours(data['total']),
+        TimeSheet::Time::Util.price(data['total'], options[:rate])
       ]
 
       data['projects'].sort_by{|k, v| v['total']}.reverse.to_h.each do |pname, pdata|
@@ -167,18 +167,18 @@ class Mps::Time::Cmd
         tdata << [
           pname,
           'all',
-          Mps::Time::Util.minutes(pdata['total']),
-          Mps::Time::Util.hours(pdata['total']),
-          Mps::Time::Util.price(pdata['total'], options[:rate])
+          TimeSheet::Time::Util.minutes(pdata['total']),
+          TimeSheet::Time::Util.hours(pdata['total']),
+          TimeSheet::Time::Util.price(pdata['total'], options[:rate])
         ]
         
         pdata['activities'].sort_by{|k, v| v}.reverse.to_h.each do |aname, atotal|
           tdata << [
             '',
             aname,
-            Mps::Time::Util.minutes(atotal),
-            Mps::Time::Util.hours(atotal),
-            Mps::Time::Util.price(atotal, options[:rate])
+            TimeSheet::Time::Util.minutes(atotal),
+            TimeSheet::Time::Util.hours(atotal),
+            TimeSheet::Time::Util.price(atotal, options[:rate])
           ]
           previous = pname
         end
@@ -186,7 +186,7 @@ class Mps::Time::Cmd
 
       tdata << '-'
 
-      tp = Mps::TablePrinter.new tdata, options
+      tp = TimeSheet::TablePrinter.new tdata, options
       puts tp.generate
 
       puts [

@@ -1,11 +1,12 @@
 require 'spec_helper'
 require 'time'
 
-RSpec.describe Mps::Time::Util do
+RSpec.describe TimeSheet::Time::Util do
 
   before :each do
     @now = Time.parse(self.class.description)
     allow(Time).to receive(:now) {@now}
+    allow(Date).to receive(:today) {@now.to_date}
   end
 
   context '2017-11-30 8:55' do
@@ -52,13 +53,13 @@ RSpec.describe Mps::Time::Util do
     # end
 
     it 'should calculate this year' do
-      expect(subject.year_start).to eq(Date.parse('2018-01-01'))
-      expect(subject.year_end).to eq(Date.parse('2018-12-31'))
+      expect(subject.year_start).to eq(Date.parse("2018-01-01"))
+      expect(subject.year_end).to eq(Date.parse("2018-12-31"))
     end
 
     it 'should calculate last year' do
-      expect(subject.year_start(-1)).to eq(Date.parse('2017-01-01'))
-      expect(subject.year_end(-1)).to eq(Date.parse('2017-12-31'))
+      expect(subject.year_start(-1)).to eq(Date.parse("2017-01-01"))
+      expect(subject.year_end(-1)).to eq(Date.parse("2017-12-31"))
     end
   end
 
