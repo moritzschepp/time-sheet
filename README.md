@@ -12,7 +12,8 @@ gem install time-sheet
 ## Usage
 
 The gem bundles an executable which includes a help command, just run
-`time-sheet.rb --help`
+`time-sheet.rb --help`. As an example spreadsheet, have a look at
+[the sheet we use for tests](https://github.com/moritzschepp/time-sheet/raw/master/spec/data/time_log.xls).
 
 ## Contributing
 
