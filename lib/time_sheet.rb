@@ -1,7 +1,11 @@
 require 'time_sheet/version'
 
 if defined?(Bundler)
-  require 'pry'
+  begin
+    require 'pry'
+  rescue LoadError => e
+    # do nothing, we are probably in production
+  end
 end
 
 module TimeSheet

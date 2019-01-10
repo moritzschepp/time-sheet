@@ -103,7 +103,7 @@ class TimeSheet::Time::Cmd
       o.boolean '-v', '--verbose', 'be more verbose'
       o.separator "\n  invoice options:"
       o.integer '--package', 'for invoice output: build packages of this duration in hours', default: 0
-      o.integer '--petty', 'fold records of a certain threshold into a "misc" activity', default: 0
+      o.integer '--petty', 'fold records under a certain threshold into a "misc" activity', default: 0
     end
   end
 
