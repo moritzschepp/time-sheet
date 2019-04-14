@@ -48,6 +48,8 @@ class TimeSheet::TablePrinter
       else
         last_column ? value : value.ljust(width)
     end
+
+    options[:trim] ? str.strip : str
   end
 
   def size(value)
