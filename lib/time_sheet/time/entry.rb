@@ -7,7 +7,7 @@ class TimeSheet::Time::Entry
     @data = data
   end
 
-  attr_accessor :prev, :next
+  attr_accessor :prev, :next, :exception, :data
 
   def project
     @data['project'] ||= self.prev.project
@@ -31,7 +31,6 @@ class TimeSheet::Time::Entry
       @data['start'].hour, @data['start'].min
     )
   end
-
 
   def end
     ends_at = @data['end'] || (self.next ? self.next.start : self.class.now)
@@ -96,8 +95,25 @@ class TimeSheet::Time::Entry
   end
 
   def valid?
-    (duration > 0) &&
-    ((self.start < self.end) || !self.next)
+    valid!
+    true
+  rescue TimeSheet::Time::Exception => e
+    self.exception = e
+    false
+  end
+
+  def valid!
+    if !@data['start']
+      raise TimeSheet::Time::Exception.new('time entry has no start')
+    end
+
+    if duration <= 0
+      raise TimeSheet::Time::Exception.new('time entry duration is 0 or less')
+    end
+
+    if (self.start >= self.end) && self.next
+      raise TimeSheet::Time::Exception.new('time entry has no end')
+    end
   end
 
   def to_row

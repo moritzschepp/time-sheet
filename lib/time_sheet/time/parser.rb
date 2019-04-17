@@ -37,7 +37,12 @@ class TimeSheet::Time::Parser
       results.each do |r|
         unless r.valid?
           # byebug
-          raise TimeSheet::Time::Exception.new("invalid time entry: #{r.to_row.inspect}")
+          raise r.exception, [
+            r.exception.message, ': ',
+            r.data.inspect,
+            ', preceeding entry: ',
+            r.prev
+          ].join
         end
       end
       results
