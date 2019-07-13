@@ -15,6 +15,9 @@ The gem bundles an executable which includes a help command, just run
 `time-sheet.rb --help`. As an example spreadsheet, have a look at
 [the sheet we use for tests](https://github.com/moritzschepp/time-sheet/raw/master/spec/data/time_log.xls).
 
+A config file at `~/.time-sheet.conf` is read if it exists. The only possible
+option is `location: /path/to/excel/sheets`. It can be specified multiple times.
+
 ### Processing data with other tools
 
 You can simply let the tool output a full list of time entries that are easy to
@@ -55,6 +58,10 @@ use it, you have to
 sys.stdin = open('/dev/tty')
 ipdb.set_trace()
 ~~~
+
+We keep a loose collection of scripts in the
+[scripts](https://github.com/moritzschepp/time-sheet/tree/master/scripts)
+folder.
 
 ## Contributing
 

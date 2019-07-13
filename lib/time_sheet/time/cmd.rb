@@ -77,10 +77,25 @@ class TimeSheet::Time::Cmd
     end
   end
 
+  def default_location
+    result = []
+    config_file = "#{ENV['HOME']}/.time-sheet.conf"
+    if File.exists?(config_file)
+      File.read(config_file).split("\n").each do |line|
+        if m = line.match(/^([a-z_]+):(.*)$/)
+          result << m[2].strip if m[1] == 'location'
+        end
+      end
+    end
+    result << "#{ENV['HOME']}/time-sheet" if result.empty?
+    result
+  end
+
   def options
     @options ||= Slop.parse do |o|
       o.banner = [
         "usage: time.rb [command] [options]\n",
+        "visit https://github.com/moritzschepp/time-sheet for further information\n",
         'available commands:',
         "  report (default): list entries conforming to given criteria",
         "  invoice: compress similar entries and filter petty ones. Optionally package for e.g. monthly invoicing",
@@ -90,7 +105,7 @@ class TimeSheet::Time::Cmd
       o.boolean '-h', '--help', 'show help'
       o.boolean '--version', 'show the version'
       o.array('-l', '--location', 'a location to gather data from (file or directory)',
-        default: ["#{ENV['HOME']}/Desktop/cloud/time"]
+        default: default_location
       )
       o.string '-f', '--from', 'ignore entries older than the date given'
       o.string '-t', '--to', 'ignore entries more recent than the date given'
