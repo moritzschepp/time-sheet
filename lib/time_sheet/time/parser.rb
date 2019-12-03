@@ -1,4 +1,6 @@
 require 'spreadsheet'
+require 'httpclient'
+require 'csv'
 
 class TimeSheet::Time::Parser
 
@@ -52,24 +54,63 @@ class TimeSheet::Time::Parser
   def hashes_per_file
     @hashes_per_file ||= begin
       files.map do |f|
-        results = []
-        Spreadsheet.open(f).worksheets.each do |sheet|
-          headers = sheet.rows.first.to_a
-          sheet.rows[1..-1].each do |row|
-            # TODO find a way to guard against xls sheets with 65535 (empty)
-            # lines, perhaps:
-            # break if row[1].nil?
-
-            record = {}
-            row.each_with_index do |value, i|
-              record[headers[i]] = value
-            end
-            results << record
-          end
+        if f.match(/https:\/\/docs\.google\.com/)
+          parse_google_doc(f)
+        else
+          parse_xls(f)
         end
-        results
       end
     end
+  end
+
+  def parse_xls(filename)
+    results = []
+
+    Spreadsheet.open(filename).worksheets.each do |sheet|
+      headers = sheet.rows.first.to_a
+      sheet.rows[1..-1].each do |row|
+        # TODO find a way to guard against xls sheets with 65535 (empty)
+        # lines, perhaps:
+        # break if row[1].nil?
+
+        record = {}
+        row.each_with_index do |value, i|
+          record[headers[i]] = value
+        end
+        results << record
+      end
+    end
+
+    results
+  end
+
+  def parse_google_doc(share_url)
+    id = share_url.match(/\/d\/([^\/]+)\//)[1]
+    url = "https://docs.google.com/spreadsheets/d/#{id}/export?exportFormat=tsv"
+    response = HTTPClient.get(url)
+
+    if response.status == 200
+      data = CSV.parse(response.body, col_sep: "\t")
+      headers = data.shift
+      data.map do |row|
+        record = headers.zip(row).to_h
+        parse_date_and_time(record)
+      end
+    else
+      raise "request to google docs failed (#{response.status}):\n#{response.body}"
+    end
+  end
+
+  def parse_date_and_time(record)
+    record.merge(
+      'date' => (record['date'] ? Date.parse(record['date']) : nil),
+      'start' => (record['start'] ? DateTime.parse(record['start']) : nil),
+      'end' => (record['end'] ? DateTime.parse(record['end']) : nil)
+    )
+  rescue ArgumentError => e
+    puts "current record: #{record.inspect}"
+    return {}
+    # raise e
   end
 
 end

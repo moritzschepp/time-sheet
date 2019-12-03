@@ -104,7 +104,7 @@ class TimeSheet::Time::Cmd
 
       o.boolean '-h', '--help', 'show help'
       o.boolean '--version', 'show the version'
-      o.array('-l', '--location', 'a location to gather data from (file or directory)',
+      o.array('-l', '--location', 'a location to gather data from (file, directory or google docs share-url)',
         default: default_location
       )
       o.string '-f', '--from', 'ignore entries older than the date given'
