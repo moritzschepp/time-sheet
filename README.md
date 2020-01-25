@@ -3,6 +3,14 @@
 This gem allows you to parse a spreadsheet with time tracking information to
 generate various statistics suitable for invoices and project effort estimates.
 
+## Changelog
+
+v0.9.0
+
+* introduced employee data column: To use it, add a column "employee" to the
+  spreadsheets and use flag `-e` to filter by it. If employee is not set, it
+  falls back to "Me".
+
 ## Installation
 
 ```bash

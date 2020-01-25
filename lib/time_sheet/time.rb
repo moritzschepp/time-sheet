@@ -41,7 +41,7 @@ module TimeSheet::Time
     unless results['entries'].empty?
       time = (
         (options[:to] || Util.day_end) - 
-        (options[:from] || results['entries'].first[0].to_time)
+        (options[:from] || results['entries'].first[1].to_time)
       ).to_i
       days = (time.to_f / 60 / 60 / 24).round
     end

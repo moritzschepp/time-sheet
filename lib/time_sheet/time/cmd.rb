@@ -112,6 +112,7 @@ class TimeSheet::Time::Cmd
       o.string '-p', '--project', 'take only entries of this project into account'
       o.string '-a', '--activity', 'take only entries of this activity into account'
       o.string '-d', '--description', 'consider only entries matching this description'
+      o.string '-e', '--employee', 'consider only entries for this employee'
       o.float '-r', '--rate', 'use an alternative hourly rate (default: 80.0)', default: 80.00
       o.boolean '-s', '--summary', 'when reporting, add summary section'
       o.boolean '--trim', 'compact the output for processing as CSV', default: false

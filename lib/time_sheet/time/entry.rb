@@ -41,6 +41,10 @@ class TimeSheet::Time::Entry
     )
   end
 
+  def employee
+    @employee ||= @data['employee'] || (self.prev ? self.prev.employee : 'Me')
+  end
+
   # Experiment to add timezone support. However, this would complicate every day
   # handing because of daylight saving time changes.
   # def start_zone
@@ -87,6 +91,7 @@ class TimeSheet::Time::Entry
     to = (filters[:to] ? filters[:to] : nil)
     to = (to + 1).to_time if to.is_a?(Date)
 
+    self.class.attrib_matches_any?(employee, filters[:employee]) &&
     self.class.attrib_matches_any?(description, filters[:description]) &&
     self.class.attrib_matches_any?(project, filters[:project]) &&
     self.class.attrib_matches_any?(activity, filters[:activity]) &&
@@ -114,14 +119,22 @@ class TimeSheet::Time::Entry
     if (self.start >= self.end) && self.next
       raise TimeSheet::Time::Exception.new('time entry has no end')
     end
+
+    if !employee
+      raise TimeSheet::Time::Exception.new('no employee set')
+    end
   end
 
   def to_row
-    [date, start, self.end, duration.to_i, project, activity, description]
+    [
+      employee, date, start, self.end, duration.to_i, project, activity,
+      description
+    ]
   end
 
   def to_s
     values = [
+      employee,
       date.strftime('%Y-%m-%d'),
       start.strftime('%H:%M'),
       self.end.strftime('%H:%M'),
@@ -134,6 +147,7 @@ class TimeSheet::Time::Entry
 
   def to_hash
     return {
+      'employee' => employee,
       'date' => date,
       'start' => start,
       'end' => self.end,
