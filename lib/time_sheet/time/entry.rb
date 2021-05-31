@@ -105,6 +105,9 @@ class TimeSheet::Time::Entry
   rescue TimeSheet::Time::Exception => e
     self.exception = e
     false
+  rescue StandardError => e
+    binding.pry if Timesheet.options[:debug]
+    false
   end
 
   def valid!

@@ -68,10 +68,11 @@ class TimeSheet::Time::Parser
 
     Spreadsheet.open(filename).worksheets.each do |sheet|
       headers = sheet.rows.first.to_a
-      sheet.rows[1..-1].each do |row|
+      sheet.rows[1..-1].each.with_index do |row, i|
         # TODO find a way to guard against xls sheets with 65535 (empty)
         # lines, perhaps:
         # break if row[1].nil?
+        next if row.all?{|cell| [nil, ''].include?(cell)}
 
         record = {}
         row.each_with_index do |value, i|

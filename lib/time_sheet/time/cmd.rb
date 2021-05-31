@@ -3,6 +3,8 @@ require 'time'
 
 class TimeSheet::Time::Cmd
   def run
+    TimeSheet.options = options
+
     if d = options[:from]
       if d.match(/^\d\d?-\d\d?$/)
         d = "#{TimeSheet::Time::Util.now.year}-#{d}"
@@ -117,6 +119,7 @@ class TimeSheet::Time::Cmd
       o.boolean '-s', '--summary', 'when reporting, add summary section'
       o.boolean '--trim', 'compact the output for processing as CSV', default: false
       o.boolean '-v', '--verbose', 'be more verbose'
+      o.boolean '--debug', 'drop into a REPL on errors'
       o.separator "\n  invoice options:"
       o.integer '--package', 'for invoice output: build packages of this duration in hours', default: 0
       o.integer '--petty', 'fold records under a certain threshold into a "misc" activity', default: 0

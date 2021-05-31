@@ -15,4 +15,12 @@ module TimeSheet
   def self.root
     @root ||= File.expand_path(File.dirname(__FILE__) + '/..')
   end
+
+  def self.options=(options)
+    @options = options
+  end
+
+  def self.options
+    @options
+  end
 end
