@@ -66,6 +66,10 @@ class TimeSheet::Time::Cmd
           options[:to] = TimeSheet::Time::Util.month_end(-1)
           options[:summary] = true
           report
+        when 'year-to-day', 'year'
+          options[:from] = TimeSheet::Time::Util.year_start(-1)
+          options[:summary] = true
+          report
         when 'overview'
           overview
         else
