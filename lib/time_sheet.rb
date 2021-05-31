@@ -1,5 +1,12 @@
 require 'time_sheet/version'
 
+# silence HTTPClient
+module Warning
+  def warn(mgs)
+    # drop
+  end
+end
+
 if defined?(Bundler)
   begin
     require 'pry'
