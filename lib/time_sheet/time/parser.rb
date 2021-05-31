@@ -85,16 +85,16 @@ class TimeSheet::Time::Parser
     results
   end
 
-  def parse_google_doc(share_url)
-    id = share_url.match(/\/d\/([^\/]+)\//)[1]
-    url = "https://docs.google.com/spreadsheets/d/#{id}/export?exportFormat=tsv"
+  def parse_google_doc(url)
+    # Chart Tools datasource protocol, see 
+    # https://developers.google.com/chart/interactive/docs/querylanguage
     response = HTTPClient.get(url)
 
     if response.status == 200
-      data = CSV.parse(response.body, col_sep: "\t")
+      data = CSV.parse(response.body, liberal_parsing: true)
       headers = data.shift
       data.map do |row|
-        record = headers.zip(row).to_h
+        record = nullify_empties(headers.zip(row).to_h)
         parse_date_and_time(record)
       end
     else
@@ -109,9 +109,16 @@ class TimeSheet::Time::Parser
       'end' => (record['end'] ? DateTime.parse(record['end']) : nil)
     )
   rescue ArgumentError => e
+    binding.pry if TimeSheet.options[:debug]
     puts "current record: #{record.inspect}"
     return {}
     # raise e
+  end
+
+  def nullify_empties(record)
+    record.transform_values do |v|
+      v == '' ? nil : v
+    end
   end
 
 end
