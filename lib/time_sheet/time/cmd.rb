@@ -156,7 +156,7 @@ class TimeSheet::Time::Cmd
     end
 
     if options[:package]
-      package = data.last.map{|entry| entry[1]}.sum
+      package = (data.last.nil? ? 0 : data.last.map{|entry| entry[1]}.sum)
       total = options[:package] * 60
       percent = (package / total.to_f * 100)
 
