@@ -78,7 +78,6 @@ class TimeSheet::Time::Entry
   end
 
   def tags
-    binding.pry if @data['tags'] == 86
     self.class.parse_tags(@data['tags'])
   end
 
