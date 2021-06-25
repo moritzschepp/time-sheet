@@ -78,7 +78,8 @@ class TimeSheet::Time::Entry
   end
 
   def tags
-    (@data['tags'] || '').split(/\s*,\s*/)
+    binding.pry if @data['tags'] == 86
+    self.class.parse_tags(@data['tags'])
   end
 
   def working_day?
@@ -90,13 +91,23 @@ class TimeSheet::Time::Entry
     from = from.to_time if from.is_a?(Date)
     to = (filters[:to] ? filters[:to] : nil)
     to = (to + 1).to_time if to.is_a?(Date)
+    tags = self.class.parse_tags(filters[:tags])
 
+    has_tags?(tags) &&
     self.class.attrib_matches_any?(employee, filters[:employee]) &&
     self.class.attrib_matches_any?(description, filters[:description]) &&
     self.class.attrib_matches_any?(project, filters[:project]) &&
     self.class.attrib_matches_any?(activity, filters[:activity]) &&
     (!from || from <= self.start) &&
     (!to || to >= self.end)
+  end
+
+  def has_tags?(tags)
+    return true if tags.empty?
+
+    tags.all? do |tag|
+      self.tags.include?(tag)
+    end
   end
 
   def valid?
@@ -157,7 +168,8 @@ class TimeSheet::Time::Entry
       'duration' => duration,
       'project' => project,
       'activity' => activity,
-      'description' => description
+      'description' => description,
+      'tags' => tags
     }
   end
 
@@ -171,6 +183,10 @@ class TimeSheet::Time::Entry
     patterns.split(/\s*,\s*/).any? do |pattern|
       value.match(pattern)
     end
+  end
+
+  def self.parse_tags(string)
+    (string || '').to_s.downcase.split(/\s*,\s*/).map{|t| t.strip}
   end
 
 end
