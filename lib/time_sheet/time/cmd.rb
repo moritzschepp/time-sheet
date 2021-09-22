@@ -117,7 +117,7 @@ class TimeSheet::Time::Cmd
       o.string '-t', '--to', 'ignore entries more recent than the date given'
       o.string '-p', '--project', 'take only entries of this project into account'
       o.string '-a', '--activity', 'take only entries of this activity into account'
-      o.string '--tags', 'take only entries with these tags into account (comma separated, not case sensitive)'
+      o.string '--tags', 'filter by tag (comma separated, not case sensitive, prefix tag with ! to exclude)'
       o.string '-d', '--description', 'consider only entries matching this description'
       o.string '-e', '--employee', 'consider only entries for this employee'
       o.float '-r', '--rate', 'use an alternative hourly rate (default: 80.0)', default: 80.00

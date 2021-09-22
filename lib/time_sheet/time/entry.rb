@@ -105,7 +105,12 @@ class TimeSheet::Time::Entry
     return true if tags.empty?
 
     tags.all? do |tag|
-      self.tags.include?(tag)
+      if tag.match?(/^\!/)
+        t = tag.gsub(/\!/, '')
+        !self.tags.include?(t)
+      else
+        self.tags.include?(tag)
+      end
     end
   end
 
