@@ -160,7 +160,11 @@ class TimeSheet::Time::Cmd
       total = options[:package] * 60
       percent = (package / total.to_f * 100)
 
-      puts "last package duration: #{package}/#{total} (#{percent.round 2}%)"
+      puts [
+        "current package: #{package}/#{total}",
+        "(#{(package / 60.0).round(2)}/#{(total / 60.0).round(2)} hours,",
+        "#{percent.round 2}%)"
+      ].join(' ')
     end
   end
 
