@@ -39,6 +39,8 @@ class TimeSheet::Time::Cmd
           invoice
         when 'report', 'default'
           report
+        when 'verify'
+          verify
         when 'today', 't'
           options[:from] = TimeSheet::Time::Util.today
           options[:summary] = true
@@ -105,6 +107,7 @@ class TimeSheet::Time::Cmd
         'available commands:',
         "  report (default): list entries conforming to given criteria",
         "  invoice: compress similar entries and filter petty ones. Optionally package for e.g. monthly invoicing",
+        "  verify: check syntax and semantics in your input spreadsheets",
         "\n  general options:"
       ].join("\n")
 
@@ -141,6 +144,26 @@ class TimeSheet::Time::Cmd
     end
     if options[:to].is_a?(Date)
       options[:to] = options[:to].to_time + 24 * 60 * 60
+    end
+  end
+
+  def verify
+    convert_to_time
+
+    entries = TimeSheet::Time::Parser.new(options[:location]).entries
+
+    puts 'checking for changes in project with carried-over description ...'
+    entries.each do |entry|
+      next unless entry.matches?(options)
+
+      if entry.prev && entry.prev.project != entry.project
+        # we check for the same object because that means that the value has
+        # been carried over from the previous entry and that likely represents
+        # an oversight in these circumstances
+        if entry.prev.description.equal?(entry.description)
+          puts "-> | #{entry}"
+        end
+      end
     end
   end
 
