@@ -88,7 +88,7 @@ class TimeSheet::Time::Cmd
   def default_location
     result = []
     config_file = "#{ENV['HOME']}/.time-sheet.conf"
-    if File.exists?(config_file)
+    if File.exist?(config_file)
       File.read(config_file).split("\n").each do |line|
         if m = line.match(/^([a-z_]+):(.*)$/)
           result << m[2].strip if m[1] == 'location'
