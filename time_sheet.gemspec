@@ -9,6 +9,7 @@ Gem::Specification.new do |spec|
   spec.authors       = ["Moritz Schepp"]
   spec.email         = ["moritz.schepp@gmail.com"]
   spec.license       = 'GPL-3.0-only'
+  spec.homepage      = 'https://github.com/moritzschepp/time-sheet'
 
   spec.summary       = "a time tracking solution based on spreadsheets"
 
@@ -23,12 +24,12 @@ Gem::Specification.new do |spec|
   spec.bindir        = "exe"
   spec.executables   = spec.files.grep(%r{^exe/}) { |f| File.basename(f) }
   spec.require_paths = ["lib"]
+  spec.required_ruby_version = '>= 3.1.0'
 
   spec.add_dependency 'spreadsheet'
   spec.add_dependency 'slop'
   spec.add_dependency 'httpclient'
 
-  spec.add_development_dependency "bundler", "~> 2.2.16"
   spec.add_development_dependency "rake", "~> 13.0"
   spec.add_development_dependency "rspec", "~> 3.0"
   spec.add_development_dependency 'pry'
