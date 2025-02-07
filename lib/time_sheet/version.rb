@@ -1,3 +1,3 @@
 module TimeSheet
-  VERSION = "0.15.0"
+  VERSION = "1.0.0"
 end

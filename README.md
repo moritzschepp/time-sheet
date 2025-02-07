@@ -5,6 +5,11 @@ generate various statistics suitable for invoices and project effort estimates.
 
 ## Changelog
 
+v1.0.0
+
+* input files need to be .xlsx files now because we needed to replace the
+  spreadsheet parser, see #1
+
 v0.9.0
 
 * introduced employee data column: To use it, add a column "employee" to the
