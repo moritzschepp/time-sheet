@@ -1,4 +1,4 @@
-require 'spreadsheet'
+require 'roo'
 require 'httpclient'
 require 'csv'
 
@@ -12,7 +12,7 @@ class TimeSheet::Time::Parser
     results = []
     @dirs.each do |dir|
       if File.directory?(dir)
-        results += Dir["#{dir}/**/*.xls"]
+        results += Dir["#{dir}/**/*.xlsx"]
       else
         results << dir
       end
@@ -38,7 +38,6 @@ class TimeSheet::Time::Parser
       results.sort!
       results.each do |r|
         unless r.valid?
-          # byebug
           raise r.exception, [
             r.exception.message, ': ',
             r.data.inspect,
@@ -57,28 +56,25 @@ class TimeSheet::Time::Parser
         if f.match(/https:\/\/docs\.google\.com/)
           parse_google_doc(f)
         else
-          parse_xls(f)
+          parse_xlsx(f)
         end
       end
     end
   end
 
-  def parse_xls(filename)
+  def parse_xlsx(filename)
     results = []
 
-    Spreadsheet.open(filename).worksheets.each do |sheet|
-      headers = sheet.rows.first.to_a
-      sheet.rows[1..-1].each.with_index do |row, i|
-        # TODO find a way to guard against xls sheets with 65535 (empty)
-        # lines, perhaps:
-        # break if row[1].nil?
-        next if row.all?{|cell| [nil, ''].include?(cell)}
+    xlsx = Roo::Spreadsheet.open(filename)
+    xlsx.each_with_pagename do |name, sheet|
+      headers = sheet.row(1).to_h{|e| [e, e]}
+      rows = sheet.parse(headers)
 
-        record = {}
-        row.each_with_index do |value, i|
-          record[headers[i]] = value
-        end
-        results << record
+      rows.each do |row|
+        next unless row['start']
+        next if row.values.all?{|v| [nil, ''].include?(v)}
+
+        results << row
       end
     end
 

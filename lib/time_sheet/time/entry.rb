@@ -28,7 +28,8 @@ class TimeSheet::Time::Entry
   def start
     @start ||= Time.mktime(
       date.year, date.month, date.day,
-      @data['start'].hour, @data['start'].min
+      hour_for(@data['start']),
+      minute_for(@data['start'])
     )
   end
 
@@ -37,8 +38,29 @@ class TimeSheet::Time::Entry
 
     @end ||= Time.mktime(
       date.year, date.month, date.day,
-      ends_at.hour, ends_at.min
+      hour_for(ends_at),
+      minute_for(ends_at)
     )
+  end
+
+  def hour_for(timish)
+    case timish
+    when Time then timish.hour
+    when DateTime then timish.hour
+    when Integer then timish / 60 / 60
+    else
+      binding.pry
+    end
+  end
+
+  def minute_for(timish)
+    case timish
+    when Time then timish.min
+    when DateTime then timish.min
+    when Integer then timish / 60 % 60
+    else
+      binding.pry
+    end
   end
 
   def employee
@@ -121,7 +143,7 @@ class TimeSheet::Time::Entry
     self.exception = e
     false
   rescue StandardError => e
-    binding.pry if Timesheet.options[:debug]
+    binding.pry if TimeSheet.options[:debug]
     false
   end
 

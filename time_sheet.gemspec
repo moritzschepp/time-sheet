@@ -26,7 +26,7 @@ Gem::Specification.new do |spec|
   spec.require_paths = ["lib"]
   spec.required_ruby_version = '>= 3.1.0'
 
-  spec.add_dependency 'spreadsheet'
+  spec.add_dependency 'roo'
   spec.add_dependency 'slop'
   spec.add_dependency 'httpclient'
 
