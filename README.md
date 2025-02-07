@@ -8,7 +8,7 @@ generate various statistics suitable for invoices and project effort estimates.
 v1.0.0
 
 * input files need to be .xlsx files now because we needed to replace the
-  spreadsheet parser, see #1
+  spreadsheet parser, see [#1](https://github.com/moritzschepp/time-sheet/issues/1)
 
 v0.9.0
 
