@@ -3,7 +3,7 @@ require "spec_helper"
 RSpec.describe TimeSheet::Time do
   it 'should deal well with time entries overflowing a package' do
     opts = {
-      location: ["spec/data/time_log.xls"],
+      location: ["spec/data/time_log.xlsx"],
       from: Time.mktime(2017, 8, 1, 14),
       to: Time.mktime(2017, 8, 1, 17),
       package: 1
@@ -21,7 +21,7 @@ RSpec.describe TimeSheet::Time do
 
   it 'should deal well with time entries exactly completing a package' do
     opts = {
-      location: ["spec/data/time_log.xls"],
+      location: ["spec/data/time_log.xlsx"],
       from: Time.mktime(2017, 8, 1, 14),
       to: Time.mktime(2017, 8, 1, 19),
       package: 1

@@ -14,7 +14,20 @@ class TimeSheet::Time::Entry
   end
 
   def activity
-    @data['activity'] ||= self.prev.activity
+    if !@data['activity']
+      carry_mode = TimeSheet.options[:carry_over_activity]
+      use_prev = (
+        carry_mode == 'previous' ||
+        (carry_mode == 'same-description' && self.prev.description == description)
+      )
+      if use_prev
+        @data['activity'] = self.prev.activity
+      end
+
+      @data['activity'] ||= TimeSheet.options[:default_activity] || ''
+    end
+
+    @data['activity']
   end
 
   def description

@@ -8,6 +8,8 @@ module TimeSheet::Time
   autoload :Util, 'time_sheet/time/util'
 
   def self.report(options)
+    TimeSheet.options = options
+
     results = {
       'entries' => [],
       'total' => 0.0,
@@ -40,7 +42,7 @@ module TimeSheet::Time
 
     unless results['entries'].empty?
       time = (
-        (options[:to] || Util.day_end) - 
+        (options[:to] || Util.day_end) -
         (options[:from] || results['entries'].first[1].to_time)
       ).to_i
       days = (time.to_f / 60 / 60 / 24).round
@@ -65,6 +67,8 @@ module TimeSheet::Time
   end
 
   def self.invoice(options)
+    TimeSheet.options = options
+    
     grouped = {}
     Parser.new(options[:location]).entries.each do |e|
       if e.matches?(options)
@@ -102,7 +106,7 @@ module TimeSheet::Time
           next
         end
       end
-      
+
       packages.last << row
       ptotal += row[1]
     end

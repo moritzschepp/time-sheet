@@ -1,10 +1,10 @@
+require 'yaml'
+
 require 'slop'
 require 'time'
 
 class TimeSheet::Time::Cmd
   def run
-    TimeSheet.options = options
-
     if d = options[:from]
       if d.match(/^\d\d?-\d\d?$/)
         d = "#{TimeSheet::Time::Util.now.year}-#{d}"
@@ -85,17 +85,22 @@ class TimeSheet::Time::Cmd
     end
   end
 
-  def default_location
-    result = []
-    config_file = "#{ENV['HOME']}/.time-sheet.conf"
-    if File.exist?(config_file)
-      File.read(config_file).split("\n").each do |line|
-        if m = line.match(/^([a-z_]+):(.*)$/)
-          result << m[2].strip if m[1] == 'location'
-        end
-      end
+  def config
+    defaults = {
+      'location' => "#{ENV['HOME']}/time",
+      'carry_over_activity' => 'previous'
+    }
+
+    file = "#{ENV['HOME']}/.time-sheet.conf"
+    return defaults unless File.exist?(file)
+
+    result = YAML.load_file(file)
+    result = defaults.merge(result)
+
+    unless result['location'].is_a?(Array)
+      result['location'] = [result['location']]
     end
-    result << "#{ENV['HOME']}/time-sheet" if result.empty?
+
     result
   end
 
@@ -114,7 +119,7 @@ class TimeSheet::Time::Cmd
       o.boolean '-h', '--help', 'show help'
       o.boolean '--version', 'show the version'
       o.array('-l', '--location', 'a location to gather data from (file, directory or google docs share-url)',
-        default: default_location
+        default: config['location']
       )
       o.string '-f', '--from', 'ignore entries older than the date given'
       o.string '-t', '--to', 'ignore entries more recent than the date given'
@@ -123,6 +128,12 @@ class TimeSheet::Time::Cmd
       o.string '--tags', 'filter by tag (comma separated, not case sensitive, prefix tag with ! to exclude)'
       o.string '-d', '--description', 'consider only entries matching this description'
       o.string '-e', '--employee', 'consider only entries for this employee'
+      o.string(
+        '--carry-over-activity',
+        'mode for carrying over activity (previous|same-description)',
+        default: config['carry_over_activity']
+      )
+      o.string '--default-activity', 'default activity', default: config['default_activity']
       o.float '-r', '--rate', 'use an alternative hourly rate (default: 80.0)', default: 80.00
       o.boolean '-s', '--summary', 'when reporting, add summary section'
       o.boolean '--trim', 'compact the output for processing as CSV', default: false
@@ -148,6 +159,8 @@ class TimeSheet::Time::Cmd
   end
 
   def verify
+    TimeSheet.options = options
+
     convert_to_time
 
     entries = TimeSheet::Time::Parser.new(options[:location]).entries
@@ -222,7 +235,7 @@ class TimeSheet::Time::Cmd
           TimeSheet::Time::Util.hours(pdata['total']),
           TimeSheet::Time::Util.price(pdata['total'], options[:rate])
         ]
-        
+
         pdata['activities'].sort_by{|k, v| v}.reverse.to_h.each do |aname, atotal|
           tdata << [
             '',
