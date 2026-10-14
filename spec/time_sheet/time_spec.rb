@@ -88,4 +88,18 @@ RSpec.describe TimeSheet::Time do
     expect(data['raw_total']).to eq(1053.0)
     expect(data['tags']['ai']).to eq(277.0)
   end
+
+  it 'should filter descriptions when rendering invoice rows without merging them' do
+    base = {'date' => Date.new(2017, 8, 1), 'project' => 'p', 'activity' => 'a'}
+    entries = [
+      TimeSheet::Time::Entry.new(base.merge('start' => 9 * 3600, 'end' => 10 * 3600, 'description' => 'mail to Tom')),
+      TimeSheet::Time::Entry.new(base.merge('start' => 10 * 3600, 'end' => 11 * 3600, 'description' => 'mail to Lana'))
+    ]
+    options = {package: 0, petty: nil, filter_descriptions: 'Tom|Lana'}
+
+    packages = described_class.invoice_entries(entries, options)
+
+    expect(packages.first.size).to eq(2)
+    expect(packages.first.map{|row| row[2]}).to eq(['mail to ', 'mail to '])
+  end
 end

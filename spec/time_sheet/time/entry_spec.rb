@@ -97,4 +97,37 @@ RSpec.describe TimeSheet::Time::Entry do
       expect(e.duration).to eq(60.0)
     end
   end
+
+  describe 'description output filter' do
+    after { TimeSheet.options = nil }
+
+    def row_for(description)
+      entry(base.merge('start' => 9 * 3600, 'end' => 10 * 3600, 'description' => description)).to_row
+    end
+
+    it 'drops the matching part of the description' do
+      TimeSheet.options = {filter_descriptions: 'mail to (Tom|Lana)'}
+      expect(row_for('mail to Tom about the report').last).to eq(' about the report')
+    end
+
+    it 'matches anywhere in the description' do
+      TimeSheet.options = {filter_descriptions: 'Lana'}
+      expect(row_for('mail to Lana').last).to eq('mail to ')
+    end
+
+    it 'leaves non-matching descriptions alone' do
+      TimeSheet.options = {filter_descriptions: 'mail to (Tom|Lana)'}
+      expect(row_for('write docs').last).to eq('write docs')
+    end
+
+    it 'leaves descriptions alone without a filter' do
+      TimeSheet.options = nil
+      expect(row_for('write docs').last).to eq('write docs')
+    end
+
+    it 'applies repeatedly until no match remains' do
+      TimeSheet.options = {filter_descriptions: 'ba'}
+      expect(row_for('bbaa').last).to eq('')
+    end
+  end
 end

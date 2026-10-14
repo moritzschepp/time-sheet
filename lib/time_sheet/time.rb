@@ -94,7 +94,7 @@ module TimeSheet::Time
       grouped[[e.date, e.description]] += e.duration.to_i
     end
     rows = []
-    grouped.each{|k, d| rows << [k.first, d, k.last]}
+    grouped.each{|k, d| rows << [k.first, d, Entry.filter_description(k.last, options)]}
     packages = [[]]
     ptotal = 0
 

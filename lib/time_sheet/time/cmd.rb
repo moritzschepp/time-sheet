@@ -130,6 +130,7 @@ class TimeSheet::Time::Cmd
       o.string '--tags', 'filter by tag (comma separated, not case sensitive, prefix tag with ! to exclude)'
       o.string '-b', '--tag-boosts', 'multiply the time of entries by a factor per tag, e.g. ai:1.4,physical:0.75'
       o.string '-d', '--description', 'consider only entries matching this description'
+      o.string '--filter-descriptions', 'drop the parts of output descriptions matching this unanchored regex'
       o.string '-e', '--employee', 'consider only entries for this employee'
       o.string(
         '--carry-over-activity',

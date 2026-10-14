@@ -53,6 +53,24 @@ RSpec.describe TimeSheet::Time::Cmd do
     expect(output).to include('ai: 4.62 h (26.3%)')
   end
 
+  it 'drops the matching part of descriptions in report output' do
+    cmd.instance_variable_set(:@options, options_with(filter_descriptions: 'finish '))
+
+    output = capture_stdout { cmd.report }
+
+    expect(output).to include('OAI-PMH export script for John')
+    expect(output).not_to include('finish OAI-PMH')
+  end
+
+  it 'drops the matching part of descriptions in invoice output' do
+    cmd.instance_variable_set(:@options, options_with(package: 0.0, filter_descriptions: 'finish '))
+
+    output = capture_stdout { cmd.invoice }
+
+    expect(output).to include('OAI-PMH export script for John')
+    expect(output).not_to include('finish OAI-PMH')
+  end
+
   describe '#parse_tag_boosts' do
     it 'parses comma-separated tag:factor pairs' do
       expect(cmd.parse_tag_boosts('ai:1.4, physical:0.75')).to eq('ai' => 1.4, 'physical' => 0.75)

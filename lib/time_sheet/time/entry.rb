@@ -207,8 +207,26 @@ class TimeSheet::Time::Entry
   def to_row
     [
       employee, date, start, self.end, duration.to_i, project, activity,
-      description
+      self.class.filter_description(description, TimeSheet.options)
     ]
+  end
+
+  # Drops the parts of a description matching the --filter-descriptions regex,
+  # repeating until no further match remains. The match is unanchored; rows are
+  # never excluded, only the rendered text is changed.
+  def self.filter_description(value, options)
+    pattern = options && options[:filter_descriptions]
+    return value if pattern.nil? || pattern.to_s.empty?
+
+    regexp = Regexp.new(pattern)
+    result = value.to_s
+    loop do
+      filtered = result.gsub(regexp, '')
+      break if filtered == result
+
+      result = filtered
+    end
+    result
   end
 
   def to_s

@@ -42,6 +42,13 @@ Tag times can be scaled per tag with `-b` / `--tag-boosts`, e.g.
 product of the factors of the tags it carries; untagged or unboosted entries are
 left unchanged. The `Tags:` section always reports unboosted time.
 
+The rendered descriptions can be cleaned up with `--filter-descriptions`, a
+single unanchored regular expression whose matches are removed from the output
+(reapplied until no match remains):
+`time-sheet.rb --filter-descriptions "mail to (Tom|Lana)"` turns *"mail to Tom
+about the report"* into *" about the report"*. It only affects what is printed;
+no rows are excluded.
+
 ### Processing data with other tools
 
 You can simply let the tool output a full list of time entries that are easy to
