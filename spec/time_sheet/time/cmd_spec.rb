@@ -44,4 +44,27 @@ RSpec.describe TimeSheet::Time::Cmd do
     expect(output).to include('current package')
     expect(output).to include('Tags:')
   end
+
+  it 'keeps the tag summary on unboosted time' do
+    cmd.instance_variable_set(:@options, options_with(package: 0.0, tag_boosts: {'ai' => 2.0}))
+
+    output = capture_stdout { cmd.invoice }
+
+    expect(output).to include('ai: 4.62 h (26.3%)')
+  end
+
+  describe '#parse_tag_boosts' do
+    it 'parses comma-separated tag:factor pairs' do
+      expect(cmd.parse_tag_boosts('ai:1.4, physical:0.75')).to eq('ai' => 1.4, 'physical' => 0.75)
+    end
+
+    it 'lowercases the tag names' do
+      expect(cmd.parse_tag_boosts('AI:2')).to eq('ai' => 2.0)
+    end
+
+    it 'returns an empty hash for blank input' do
+      expect(cmd.parse_tag_boosts(nil)).to eq({})
+      expect(cmd.parse_tag_boosts('')).to eq({})
+    end
+  end
 end

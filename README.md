@@ -37,6 +37,11 @@ activity and description are unchanged, so a run of rows describing one task onl
 needs to be tagged once. The `report` and `invoice` commands append a `Tags:`
 section showing how much of the reported time falls on each tag.
 
+Tag times can be scaled per tag with `-b` / `--tag-boosts`, e.g.
+`time-sheet.rb -b ai:1.4,physical:0.75`. Each entry's time is multiplied by the
+product of the factors of the tags it carries; untagged or unboosted entries are
+left unchanged. The `Tags:` section always reports unboosted time.
+
 ### Processing data with other tools
 
 You can simply let the tool output a full list of time entries that are easy to

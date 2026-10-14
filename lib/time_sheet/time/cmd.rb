@@ -5,6 +5,8 @@ require 'time'
 
 class TimeSheet::Time::Cmd
   def run
+    options[:tag_boosts] = parse_tag_boosts(options[:tag_boosts])
+
     if d = options[:from]
       if d.match(/^\d\d?-\d\d?$/)
         d = "#{TimeSheet::Time::Util.now.year}-#{d}"
@@ -126,6 +128,7 @@ class TimeSheet::Time::Cmd
       o.string '-p', '--project', 'take only entries of this project into account'
       o.string '-a', '--activity', 'take only entries of this activity into account'
       o.string '--tags', 'filter by tag (comma separated, not case sensitive, prefix tag with ! to exclude)'
+      o.string '-b', '--tag-boosts', 'multiply the time of entries by a factor per tag, e.g. ai:1.4,physical:0.75'
       o.string '-d', '--description', 'consider only entries matching this description'
       o.string '-e', '--employee', 'consider only entries for this employee'
       o.string(
@@ -147,6 +150,15 @@ class TimeSheet::Time::Cmd
 
   def command
     options.arguments.shift || 'default'
+  end
+
+  def parse_tag_boosts(value)
+    return {} if value.nil? || value.to_s.strip.empty?
+
+    value.split(/\s*,\s*/).each_with_object({}) do |pair, result|
+      tag, factor = pair.split(/\s*:\s*/, 2)
+      result[tag.to_s.downcase] = factor.to_f
+    end
   end
 
   def convert_to_time
@@ -204,7 +216,7 @@ class TimeSheet::Time::Cmd
       ].join(' ')
     end
 
-    print_tags(TimeSheet::Time.tag_totals(entries), entries.sum(&:duration))
+    print_tags(TimeSheet::Time.tag_totals(entries), entries.sum(&:raw_duration))
   end
 
   def report
@@ -265,7 +277,7 @@ class TimeSheet::Time::Cmd
       ].join(', ')
     end
 
-    print_tags(data['tags'], data['total'])
+    print_tags(data['tags'], data['raw_total'])
   end
 
   def print_tags(tags, total)

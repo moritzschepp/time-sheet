@@ -72,4 +72,20 @@ RSpec.describe TimeSheet::Time do
 
     expect(described_class.tag_totals(entries)).to eq('ai' => 277.0)
   end
+
+  it 'should boost the durations of tagged entries but not the tag summary' do
+    opts = {
+      location: ["spec/data/time_log.xlsx"],
+      from: Time.mktime(2017, 8, 1),
+      to: Time.mktime(2017, 8, 5),
+      carry_over_activity: 'previous',
+      tag_boosts: {'ai' => 1.4}
+    }
+    data = described_class.report(opts)
+
+    # the totals are boosted, the tag summary stays unboosted
+    expect(data['total']).to be_within(0.001).of(1163.8)
+    expect(data['raw_total']).to eq(1053.0)
+    expect(data['tags']['ai']).to eq(277.0)
+  end
 end

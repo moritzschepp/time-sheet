@@ -11,6 +11,7 @@ module TimeSheet::Time
     results = {
       'entries' => [],
       'total' => 0.0,
+      'raw_total' => 0.0,
       'projects' => {},
       'tags' => {}
     }
@@ -27,6 +28,7 @@ module TimeSheet::Time
     end
 
     results['tags'] = tag_totals(matching)
+    results['raw_total'] = matching.sum(&:raw_duration)
 
     averages(results, options)
 
@@ -40,13 +42,14 @@ module TimeSheet::Time
     Parser.new(options[:location]).entries.select { |e| e.matches?(options) }
   end
 
-  # Sums the duration of entries carrying a tag. An entry with several tags
-  # contributes its full duration to each of them, so the per-tag totals do not
-  # necessarily add up to the overall total.
+  # Sums the unboosted duration of entries carrying a tag, so the tag breakdown
+  # reflects actual time regardless of any --tag-boosts factors. An entry with
+  # several tags contributes its full duration to each of them, so the per-tag
+  # totals do not necessarily add up to the overall total.
   def self.tag_totals(entries)
     totals = Hash.new(0.0)
     entries.each do |e|
-      e.tags.each { |tag| totals[tag] += e.duration }
+      e.tags.each { |tag| totals[tag] += e.raw_duration }
     end
     totals
   end

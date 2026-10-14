@@ -109,7 +109,18 @@ class TimeSheet::Time::Entry
   # end
 
   def duration
+    raw_duration * factor
+  end
+
+  def raw_duration
     (self.end - self.start) / 60
+  end
+
+  # Multiplier applied to this entry's time: the product of the boost factors of
+  # all its tags. Tags without a boost factor leave the time unchanged.
+  def factor
+    boosts = (TimeSheet.options && TimeSheet.options[:tag_boosts]) || {}
+    tags.inject(1.0){|f, tag| f * (boosts[tag] || 1.0)}
   end
 
   def tags
@@ -180,7 +191,7 @@ class TimeSheet::Time::Entry
       raise TimeSheet::Time::Exception.new('time entry has no start')
     end
 
-    if duration <= 0
+    if raw_duration <= 0
       raise TimeSheet::Time::Exception.new('time entry duration is 0 or less')
     end
 
