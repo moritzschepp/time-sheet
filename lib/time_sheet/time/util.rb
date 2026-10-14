@@ -58,4 +58,10 @@ module TimeSheet::Time::Util
     (self.hours(duration) * rate).round(2)
   end
 
+  def self.share(part, whole)
+    return 0.0 if whole.nil? || whole.to_f.zero?
+
+    (part / whole.to_f * 100).round(1)
+  end
+
 end

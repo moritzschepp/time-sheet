@@ -183,7 +183,8 @@ class TimeSheet::Time::Cmd
   def invoice
     convert_to_time
 
-    data = TimeSheet::Time.invoice(options)
+    entries = TimeSheet::Time.matching_entries(options)
+    data = TimeSheet::Time.invoice_entries(entries, options)
 
     data.each do |package|
       tp = TimeSheet::TablePrinter.new package, options
@@ -191,7 +192,7 @@ class TimeSheet::Time::Cmd
       puts "\n"
     end
 
-    if options[:package]
+    if options[:package].to_f > 0
       package = (data.last.nil? ? 0 : data.last.map{|entry| entry[1]}.sum)
       total = options[:package] * 60
       percent = (package / total.to_f * 100)
@@ -202,6 +203,8 @@ class TimeSheet::Time::Cmd
         "#{percent.round 2}%)"
       ].join(' ')
     end
+
+    print_tags(TimeSheet::Time.tag_totals(entries), entries.sum(&:duration))
   end
 
   def report
@@ -260,6 +263,18 @@ class TimeSheet::Time::Cmd
         "h/week: #{data['averages']['hours_per_week'].round(2)}",
         "h/month(30 days): #{data['averages']['hours_per_month'].round(2)}"
       ].join(', ')
+    end
+
+    print_tags(data['tags'], data['total'])
+  end
+
+  def print_tags(tags, total)
+    tags ||= {}
+    return if tags.empty?
+
+    puts "\nTags:"
+    tags.sort_by{|tag, minutes| [-minutes, tag]}.each do |tag, minutes|
+      puts "#{tag}: #{TimeSheet::Time::Util.hours(minutes)} h (#{TimeSheet::Time::Util.share(minutes, total)}%)"
     end
   end
 

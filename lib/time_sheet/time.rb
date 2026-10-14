@@ -8,33 +8,47 @@ module TimeSheet::Time
   autoload :Util, 'time_sheet/time/util'
 
   def self.report(options)
-    TimeSheet.options = options
-
     results = {
       'entries' => [],
       'total' => 0.0,
-      'projects' => {}
+      'projects' => {},
+      'tags' => {}
     }
 
-    x = nil
-    Parser.new(options[:location]).entries.each do |e|
-      unless x
-        x = true
-      end
-      if e.matches?(options)
-        results['total'] += e.duration
-        results['projects'][e.project] ||= {'total' => 0.0, 'activities' => {}}
-        results['projects'][e.project]['total'] += e.duration
-        results['projects'][e.project]['activities'][e.activity] ||= 0.0
-        results['projects'][e.project]['activities'][e.activity] += e.duration
+    matching = matching_entries(options)
+    matching.each do |e|
+      results['total'] += e.duration
+      results['projects'][e.project] ||= {'total' => 0.0, 'activities' => {}}
+      results['projects'][e.project]['total'] += e.duration
+      results['projects'][e.project]['activities'][e.activity] ||= 0.0
+      results['projects'][e.project]['activities'][e.activity] += e.duration
 
-        results['entries'] << e.to_row
-      end
+      results['entries'] << e.to_row
     end
+
+    results['tags'] = tag_totals(matching)
 
     averages(results, options)
 
     results
+  end
+
+  # All entries matching the given filters. Sets TimeSheet.options first so that
+  # the carry-over rules apply while the entries are read.
+  def self.matching_entries(options)
+    TimeSheet.options = options
+    Parser.new(options[:location]).entries.select { |e| e.matches?(options) }
+  end
+
+  # Sums the duration of entries carrying a tag. An entry with several tags
+  # contributes its full duration to each of them, so the per-tag totals do not
+  # necessarily add up to the overall total.
+  def self.tag_totals(entries)
+    totals = Hash.new(0.0)
+    entries.each do |e|
+      e.tags.each { |tag| totals[tag] += e.duration }
+    end
+    totals
   end
 
   def self.averages(results, options)
@@ -67,14 +81,14 @@ module TimeSheet::Time
   end
 
   def self.invoice(options)
-    TimeSheet.options = options
-    
+    invoice_entries(matching_entries(options), options)
+  end
+
+  def self.invoice_entries(entries, options)
     grouped = {}
-    Parser.new(options[:location]).entries.each do |e|
-      if e.matches?(options)
-        grouped[[e.date, e.description]] ||= 0
-        grouped[[e.date, e.description]] += e.duration.to_i
-      end
+    entries.each do |e|
+      grouped[[e.date, e.description]] ||= 0
+      grouped[[e.date, e.description]] += e.duration.to_i
     end
     rows = []
     grouped.each{|k, d| rows << [k.first, d, k.last]}

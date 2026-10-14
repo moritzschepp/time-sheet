@@ -17,6 +17,12 @@ RSpec.describe TimeSheet::Time::Util do
     it 'should calculate yesterday' do
       expect(subject.yesterday).to eq(Date.parse '2017-11-29')
     end
+
+    it 'should calculate a percentage share' do
+      expect(subject.share(245, 1053)).to eq(23.3)
+      expect(subject.share(5, 0)).to eq(0.0)
+      expect(subject.share(5, nil)).to eq(0.0)
+    end
   end
 
   context '2017-12-01 16:33' do

@@ -113,7 +113,22 @@ class TimeSheet::Time::Entry
   end
 
   def tags
-    self.class.parse_tags(@data['tags'])
+    self.class.parse_tags(tag_source)
+  end
+
+  # Tags carry over from the previous entry when project, activity and
+  # description are the same, so a group of rows describing one task only needs
+  # to be tagged on its first row. Any other row has no tags.
+  def tag_source
+    raw = @data['tags']
+    return raw if raw && !raw.to_s.strip.empty?
+
+    if self.prev &&
+       self.prev.project == project &&
+       self.prev.activity == activity &&
+       self.prev.description == description
+      self.prev.tag_source
+    end
   end
 
   def working_day?

@@ -31,6 +31,12 @@ The gem bundles an executable which includes a help command, just run
 A config file at `~/.time-sheet.conf` is read if it exists. The only possible
 option is `location: /path/to/excel/sheets`. It can be specified multiple times.
 
+The spreadsheet may carry a `tags` column holding a comma-separated list of tags
+per row. A blank `tags` cell is inherited from the previous row when the project,
+activity and description are unchanged, so a run of rows describing one task only
+needs to be tagged once. The `report` and `invoice` commands append a `Tags:`
+section showing how much of the reported time falls on each tag.
+
 ### Processing data with other tools
 
 You can simply let the tool output a full list of time entries that are easy to

@@ -31,4 +31,45 @@ RSpec.describe TimeSheet::Time do
     expect(data.size).to eq(5)
     expect(data[4].last[1]).to eq(60)
   end
+
+  it 'should total the durations of tagged entries' do
+    opts = {
+      location: ["spec/data/time_log.xlsx"],
+      from: Time.mktime(2017, 8, 1),
+      to: Time.mktime(2017, 8, 5),
+      carry_over_activity: 'previous'
+    }
+    data = described_class.report(opts)
+
+    # 87 + 60 + 36 + 62, plus 32 carried over to the matching 13:02 row
+    expect(data['tags']).to eq('ai' => 277.0)
+  end
+
+  it 'should count an entry with several tags fully under each tag' do
+    base = {
+      'date' => Date.new(2017, 8, 1),
+      'project' => 'project1',
+      'activity' => 'dev',
+      'description' => 'work'
+    }
+    entries = [
+      TimeSheet::Time::Entry.new(base.merge('start' => 9 * 3600, 'end' => 10 * 3600, 'tags' => 'x,y')),
+      TimeSheet::Time::Entry.new(base.merge('start' => 10 * 3600, 'end' => 10 * 3600 + 1800))
+    ]
+    entries.each_cons(2){|a, b| b.prev = a}
+
+    expect(described_class.tag_totals(entries)).to eq('x' => 90.0, 'y' => 90.0)
+  end
+
+  it 'should total tags for the entries selected by the invoice command' do
+    opts = {
+      location: ["spec/data/time_log.xlsx"],
+      from: Time.mktime(2017, 8, 1),
+      to: Time.mktime(2017, 8, 5),
+      carry_over_activity: 'previous'
+    }
+    entries = described_class.matching_entries(opts)
+
+    expect(described_class.tag_totals(entries)).to eq('ai' => 277.0)
+  end
 end
